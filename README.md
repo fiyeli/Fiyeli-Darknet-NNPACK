@@ -1,3 +1,7 @@
+# A lancer pour le Fiyeli
+./darknet detector text cfg/coco.data cfg/yolov2.cfg yolov2.weights data/giraffe.jpg
+
+# Installation
 # Darknet with NNPACK
 NNPACK was used to optimize [Darknet](https://github.com/pjreddie/darknet) without using a GPU. It is useful for embedded devices using ARM CPUs.
 

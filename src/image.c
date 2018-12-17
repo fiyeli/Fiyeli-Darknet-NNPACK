@@ -313,18 +313,18 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
 void write_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
 {
     //TODO: Ecrire dans un fichier texte dont on choisi le nom
-    FILE *txt_file = fopen("detections.txt", "a");
+    FILE *txt_file = fopen("persons.csv", "a");
     if(txt_file == NULL) {
         perror("Error openning the result file");
         exit(1);
     }
 
-    // storing current time
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    fprintf(txt_file, "%d/%d/%d-%d:%d:%d ", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    // storing current timestamp
+    unsigned long timestamp = (unsigned long)time(NULL);
+    fprintf(txt_file, "%lu", timestamp);
 
     int i,j;
+    unsigned nb_persons = 0;
 
     for(i = 0; i < num; ++i){
         char labelstr[4096] = {0};
@@ -339,7 +339,9 @@ void write_detections(image im, detection *dets, int num, float thresh, char **n
                     strcat(labelstr, names[j]);
                 }
                 printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
-                fprintf(txt_file, "%s ", names[j]);
+                if(strncmp(names[j], "person", 7) == 0){
+                    nb_persons++;
+                }
             }
         }
         if(class >= 0){
@@ -394,7 +396,8 @@ void write_detections(image im, detection *dets, int num, float thresh, char **n
             }
         }
     }
-    fprintf(txt_file, "\n");
+
+    fprintf(txt_file, ", %u\n", nb_persons);
     fclose(txt_file);
 }
 

@@ -293,7 +293,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
     }
 }
 
-void count_persons(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
+int count_persons(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
 {
     FILE *txt_file = fopen("persons.csv", "a");
     if(txt_file == NULL) {
@@ -306,7 +306,7 @@ void count_persons(image im, detection *dets, int num, float thresh, char **name
     fprintf(txt_file, "%lu", timestamp);
 
     int i,j;
-    unsigned nb_persons = 0;
+    int nb_persons = 0;
 
     for(i = 0; i < num; ++i){
         char labelstr[4096] = {0};
@@ -367,8 +367,9 @@ void count_persons(image im, detection *dets, int num, float thresh, char **name
         }
     }
 
-    fprintf(txt_file, ", %u\n", nb_persons);
+    fprintf(txt_file, ", %i\n", nb_persons);
     fclose(txt_file);
+    return nb_persons;
 }
 
 void transpose_image(image im)

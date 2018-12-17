@@ -637,8 +637,9 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
 
 /* Implements a detector that will save the detected objects' names in
  a textfile on the disk */
-void person_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen)
+int person_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen)
 {
+    int nb_persons = 0;
     list *options = read_data_cfg(datacfg);
     char *name_list = option_find_str(options, "names", "data/names.list");
     char **names = get_labels(name_list);
@@ -690,7 +691,7 @@ void person_detector(char *datacfg, char *cfgfile, char *weightfile, char *filen
 
         //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
         if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
-        int nb_persons = count_persons(im, dets, nboxes, thresh, names, alphabet, l.classes);
+        nb_persons = count_persons(im, dets, nboxes, thresh, names, alphabet, l.classes);
         free_detections(dets, nboxes);
         if(outfile){
             save_image(im, outfile);
@@ -711,7 +712,7 @@ void person_detector(char *datacfg, char *cfgfile, char *weightfile, char *filen
 	pthreadpool_destroy(net->threadpool);
 	nnp_deinitialize();
 #endif
-  return nb_persons
+  return nb_persons;
 }
 
 /*
@@ -880,7 +881,7 @@ void network_detect(network *net, image im, float thresh, float hier_thresh, flo
 }
 */
 
-void run_detector(int argc, char **argv)
+int run_detector(int argc, char **argv)
 {
     char *prefix = find_char_arg(argc, argv, "-prefix", 0);
     float thresh = find_float_arg(argc, argv, "-thresh", .5);
@@ -943,5 +944,5 @@ void run_detector(int argc, char **argv)
     }
     //else if(0==strcmp(argv[2], "extract")) extract_detector(datacfg, cfg, weights, cam_index, filename, class, thresh, frame_skip);
     //else if(0==strcmp(argv[2], "censor")) censor_detector(datacfg, cfg, weights, cam_index, filename, class, thresh, frame_skip);
-    return 0
+    return 0;
 }

@@ -53,12 +53,6 @@ static float get_pixel(image m, int x, int y, int c)
 static float get_pixel_extend(image m, int x, int y, int c)
 {
     if(x < 0 || x >= m.w || y < 0 || y >= m.h) return 0;
-    /*
-    if(x < 0) x = 0;
-    if(x >= m.w) x = m.w-1;
-    if(y < 0) y = 0;
-    if(y >= m.h) y = m.h-1;
-    */
     if(c < 0 || c >= m.c) return 0;
     return get_pixel(m, x, y, c);
 }
@@ -259,27 +253,16 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
         if(class >= 0){
             int width = im.h * .006;
 
-            /*
-               if(0){
-               width = pow(prob, 1./2.)*10+1;
-               alphabet = 0;
-               }
-             */
-
-            //printf("%d %s: %.0f%%\n", i, names[class], prob*100);
             int offset = class*123457 % classes;
             float red = get_color(2,offset,classes);
             float green = get_color(1,offset,classes);
             float blue = get_color(0,offset,classes);
             float rgb[3];
 
-            //width = prob*20+2;
-
             rgb[0] = red;
             rgb[1] = green;
             rgb[2] = blue;
             box b = dets[i].bbox;
-            //printf("%f %f %f %f\n", b.x, b.y, b.w, b.h);
 
             int left  = (b.x-b.w/2.)*im.w;
             int right = (b.x+b.w/2.)*im.w;
@@ -312,7 +295,6 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
 
 void write_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
 {
-    //TODO: Ecrire dans un fichier texte dont on choisi le nom
     FILE *txt_file = fopen("persons.csv", "a");
     if(txt_file == NULL) {
         perror("Error openning the result file");
@@ -346,28 +328,16 @@ void write_detections(image im, detection *dets, int num, float thresh, char **n
         }
         if(class >= 0){
             int width = im.h * .006;
-
-            /*
-               if(0){
-               width = pow(prob, 1./2.)*10+1;
-               alphabet = 0;
-               }
-             */
-
-            //printf("%d %s: %.0f%%\n", i, names[class], prob*100);
             int offset = class*123457 % classes;
             float red = get_color(2,offset,classes);
             float green = get_color(1,offset,classes);
             float blue = get_color(0,offset,classes);
             float rgb[3];
 
-            //width = prob*20+2;
-
             rgb[0] = red;
             rgb[1] = green;
             rgb[2] = blue;
             box b = dets[i].bbox;
-            //printf("%f %f %f %f\n", b.x, b.y, b.w, b.h);
 
             int left  = (b.x-b.w/2.)*im.w;
             int right = (b.x+b.w/2.)*im.w;
@@ -511,7 +481,6 @@ void censor_image(image im, int dx, int dy, int w, int h)
         for(j = dy; j < dy + h && j < im.h; ++j){
             for(i = dx; i < dx + w && i < im.w; ++i){
                 im.data[i + im.w*(j + im.h*k)] = im.data[i/s*s + im.w*(j/s*s + im.h*k)];
-                //im.data[i + j*im.w + k*im.w*im.h] = 0;
             }
         }
     }
@@ -641,7 +610,6 @@ int show_image(image p, const char *name, int ms)
 void save_image_options(image im, const char *name, IMTYPE f, int quality)
 {
     char buff[256];
-    //sprintf(buff, "%s (%d)", name, windows);
     if(f == PNG)       sprintf(buff, "%s.png", name);
     else if (f == BMP) sprintf(buff, "%s.bmp", name);
     else if (f == TGA) sprintf(buff, "%s.tga", name);
@@ -999,8 +967,6 @@ image letterbox_image(image im, int w, int h)
     image resized = resize_image(im, new_w, new_h);
     image boxed = make_image(w, h, im.c);
     fill_image(boxed, .5);
-    //int i;
-    //for(i = 0; i < boxed.w*boxed.h*boxed.c; ++i) boxed.data[i] = 0;
     embed_image(resized, boxed, (w-new_w)/2, (h-new_h)/2);
     free_image(resized);
     return boxed;
@@ -1058,8 +1024,6 @@ augment_args random_augment_args(image im, float angle, float aspect, int low, i
 
     float dx = (im.w*scale/aspect - w) / 2.;
     float dy = (im.h*scale - w) / 2.;
-    //if(dx < 0) dx = 0;
-    //if(dy < 0) dy = 0;
     dx = rand_uniform(-dx, dx);
     dy = rand_uniform(-dy, dy);
 
@@ -1662,15 +1626,6 @@ void show_image_normalized(image im, const char *name)
 void show_images(image *ims, int n, char *window)
 {
     image m = collapse_images_vert(ims, n);
-    /*
-       int w = 448;
-       int h = ((float)m.h/m.w) * 448;
-       if(h > 896){
-       h = 896;
-       w = ((float)m.w/m.h) * 896;
-       }
-       image sized = resize_image(m, w, h);
-     */
     normalize_image(m);
     save_image(m, window);
     show_image(m, window, 1);

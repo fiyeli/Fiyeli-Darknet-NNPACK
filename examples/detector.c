@@ -637,7 +637,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
 
 /* Implements a detector that will save the detected objects' names in
  a textfile on the disk */
-void text_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen)
+void person_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen)
 {
     list *options = read_data_cfg(datacfg);
     char *name_list = option_find_str(options, "names", "data/names.list");
@@ -690,7 +690,7 @@ void text_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
 
         //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
         if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
-        write_detections(im, dets, nboxes, thresh, names, alphabet, l.classes);
+        int nb_persons = count_persons(im, dets, nboxes, thresh, names, alphabet, l.classes);
         free_detections(dets, nboxes);
         if(outfile){
             save_image(im, outfile);
@@ -711,6 +711,7 @@ void text_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
 	pthreadpool_destroy(net->threadpool);
 	nnp_deinitialize();
 #endif
+  return nb_persons
 }
 
 /*
@@ -928,7 +929,7 @@ void run_detector(int argc, char **argv)
     char *filename = (argc > 6) ? argv[6]: 0;
 
     if(0==strcmp(argv[2], "test")) test_detector(datacfg, cfg, weights, filename, thresh, hier_thresh, outfile, fullscreen);
-    else if(0==strcmp(argv[2], "text")) text_detector(datacfg, cfg, weights, filename, thresh, hier_thresh, outfile, fullscreen);
+    else if(0==strcmp(argv[2], "text")) return person_detector(datacfg, cfg, weights, filename, thresh, hier_thresh, outfile, fullscreen);
     else if(0==strcmp(argv[2], "train")) train_detector(datacfg, cfg, weights, gpus, ngpus, clear);
     else if(0==strcmp(argv[2], "valid")) validate_detector(datacfg, cfg, weights, outfile);
     else if(0==strcmp(argv[2], "valid2")) validate_detector_flip(datacfg, cfg, weights, outfile);
@@ -942,4 +943,5 @@ void run_detector(int argc, char **argv)
     }
     //else if(0==strcmp(argv[2], "extract")) extract_detector(datacfg, cfg, weights, cam_index, filename, class, thresh, frame_skip);
     //else if(0==strcmp(argv[2], "censor")) censor_detector(datacfg, cfg, weights, cam_index, filename, class, thresh, frame_skip);
+    return 0
 }

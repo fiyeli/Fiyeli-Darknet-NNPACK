@@ -293,7 +293,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
     }
 }
 
-void write_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
+void count_persons(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
 {
     FILE *txt_file = fopen("persons.csv", "a");
     if(txt_file == NULL) {

@@ -1,5 +1,7 @@
 # A lancer pour le Fiyeli
+```console
 ./darknet detector text cfg/coco.data cfg/yolov2.cfg yolov2.weights data/giraffe.jpg
+```
 
 # Installation
 # Darknet with NNPACK

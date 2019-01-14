@@ -1,8 +1,3 @@
-# A lancer pour le Fiyeli
-```console
-./darknet detector text cfg/coco.data cfg/yolov2.cfg yolov2.weights data/giraffe.jpg
-```
-
 # Installation
 # Darknet with NNPACK
 NNPACK was used to optimize [Darknet](https://github.com/pjreddie/darknet) without using a GPU. It is useful for embedded devices using ARM CPUs.
@@ -44,14 +39,20 @@ cd darknet-nnpack
 make
 ```
 
-## Test
-The weight files can be downloaded from the [YOLO homepage](https://pjreddie.com/darknet/yolo/).
+## Weights
+We recommand using the yolov3 weights released by darknet. You can download it using : 
 ```
-YOLOv2-tiny
-./darknet detector test cfg/coco.data cfg/yolov2-tiny.cfg yolov2-tiny.weights data/person.jpg
-YOLOv3-tiny
-./darknet detector test cfg/coco.data cfg/yolov3-tiny.cfg yolov3-tiny.weights data/person.jpg
+wget https://pjreddie.com/media/files/yolov3.weights
 ```
+Other weight files can be downloaded from the [YOLO homepage](https://pjreddie.com/darknet/yolo/).
+
+## Run person detection
+The main executable returns the number of persons detected on the picture when used with the "person" mode.
+```console
+YOLOv3
+./darknet detector person cfg/coco.data cfg/yolov3.cfg yolov3.weights data/person.jpg
+```
+
 ## Result
 Model | Build Options | Prediction Time (seconds)
 :-:|:-:|:-:

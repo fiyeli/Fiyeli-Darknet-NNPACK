@@ -52,11 +52,3 @@ The main executable returns the number of persons detected on the picture when u
 YOLOv3
 ./darknet detector person cfg/coco.data cfg/yolov3.cfg yolov3.weights data/person.jpg
 ```
-
-## Result
-Model | Build Options | Prediction Time (seconds)
-:-:|:-:|:-:
-YOLOv2-tiny | NNPACK=1,ARM_NEON=1 | 1.8
-YOLOv2-tiny | NNPACK=0,ARM_NEON=0 | 31
-YOLOv3-tiny | NNPACK=1,ARM_NEON=1 | 2.0
-YOLOv3-tiny | NNPACK=0,ARM_NEON=0 | 32

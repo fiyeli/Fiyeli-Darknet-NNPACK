@@ -42,7 +42,7 @@ make
 ## Weights
 We recommand using the yolov3 weights released by darknet. You can download it using : 
 ```
-wget https://pjreddie.com/media/files/yolov3.weights
+wget https://pjreddie.com/media/files/yolov2.weights
 ```
 Other weight files can be downloaded from the [YOLO homepage](https://pjreddie.com/darknet/yolo/).
 
@@ -50,5 +50,5 @@ Other weight files can be downloaded from the [YOLO homepage](https://pjreddie.c
 The main executable returns the number of persons detected on the picture when used with the "person" mode.
 ```console
 YOLOv3
-./darknet detector person cfg/coco.data cfg/yolov3.cfg yolov3.weights data/person.jpg
+./darknet detector person cfg/coco.data cfg/yolov2.cfg yolov2.weights data/person.jpg
 ```

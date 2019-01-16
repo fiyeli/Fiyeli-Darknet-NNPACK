@@ -295,16 +295,6 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
 
 int count_persons(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
 {
-    FILE *txt_file = fopen("persons.csv", "a");
-    if(txt_file == NULL) {
-        perror("Error openning the result file");
-        exit(1);
-    }
-
-    // storing current timestamp
-    unsigned long timestamp = (unsigned long)time(NULL);
-    fprintf(txt_file, "%lu", timestamp);
-
     int i,j;
     int nb_persons = 0;
 
@@ -366,9 +356,6 @@ int count_persons(image im, detection *dets, int num, float thresh, char **names
             }
         }
     }
-
-    fprintf(txt_file, ", %i\n", nb_persons);
-    fclose(txt_file);
     return nb_persons;
 }
 

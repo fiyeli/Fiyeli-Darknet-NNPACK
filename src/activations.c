@@ -5,9 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *get_activation_string(ACTIVATION a)
-{
-    switch(a){
+char *get_activation_string(ACTIVATION a) {
+    switch (a) {
         case LOGISTIC:
             return "logistic";
         case LOGGY:
@@ -42,29 +41,27 @@ char *get_activation_string(ACTIVATION a)
     return "relu";
 }
 
-ACTIVATION get_activation(char *s)
-{
-    if (strcmp(s, "logistic")==0) return LOGISTIC;
-    if (strcmp(s, "loggy")==0) return LOGGY;
-    if (strcmp(s, "relu")==0) return RELU;
-    if (strcmp(s, "elu")==0) return ELU;
-    if (strcmp(s, "selu")==0) return SELU;
-    if (strcmp(s, "relie")==0) return RELIE;
-    if (strcmp(s, "plse")==0) return PLSE;
-    if (strcmp(s, "hardtan")==0) return HARDTAN;
-    if (strcmp(s, "lhtan")==0) return LHTAN;
-    if (strcmp(s, "linear")==0) return LINEAR;
-    if (strcmp(s, "ramp")==0) return RAMP;
-    if (strcmp(s, "leaky")==0) return LEAKY;
-    if (strcmp(s, "tanh")==0) return TANH;
-    if (strcmp(s, "stair")==0) return STAIR;
+ACTIVATION get_activation(char *s) {
+    if (strcmp(s, "logistic") == 0) return LOGISTIC;
+    if (strcmp(s, "loggy") == 0) return LOGGY;
+    if (strcmp(s, "relu") == 0) return RELU;
+    if (strcmp(s, "elu") == 0) return ELU;
+    if (strcmp(s, "selu") == 0) return SELU;
+    if (strcmp(s, "relie") == 0) return RELIE;
+    if (strcmp(s, "plse") == 0) return PLSE;
+    if (strcmp(s, "hardtan") == 0) return HARDTAN;
+    if (strcmp(s, "lhtan") == 0) return LHTAN;
+    if (strcmp(s, "linear") == 0) return LINEAR;
+    if (strcmp(s, "ramp") == 0) return RAMP;
+    if (strcmp(s, "leaky") == 0) return LEAKY;
+    if (strcmp(s, "tanh") == 0) return TANH;
+    if (strcmp(s, "stair") == 0) return STAIR;
     fprintf(stderr, "Couldn't find activation function %s, going with ReLU\n", s);
     return RELU;
 }
 
-float activate(float x, ACTIVATION a)
-{
-    switch(a){
+float activate(float x, ACTIVATION a) {
+    switch (a) {
         case LINEAR:
             return linear_activate(x);
         case LOGISTIC:
@@ -97,39 +94,37 @@ float activate(float x, ACTIVATION a)
     return 0;
 }
 
-void activate_array(float *x, const int n, const ACTIVATION a)
-{
+void activate_array(float *x, const int n, const ACTIVATION a) {
     int i;
-    for(i = 0; i < n; ++i){
+    for (i = 0; i < n; ++i) {
         x[i] = activate(x[i], a);
     }
 }
 
 #ifdef NNPACK
 struct activate_params {
-	float *x;
-	int n;
-	ACTIVATION a;
+    float *x;
+    int n;
+    ACTIVATION a;
 };
 
 void activate_array_compute(struct activate_params *params, size_t c)
 {
-	int i;
-	for (i = 0; i < params->n; i++) {
-		params->x[c*params->n + i] = activate(params->x[c*params->n + i], params->a);
-	}
+    int i;
+    for (i = 0; i < params->n; i++) {
+        params->x[c*params->n + i] = activate(params->x[c*params->n + i], params->a);
+    }
 }
 
 void activate_array_thread(float *x, const int c, const int n, const ACTIVATION a, pthreadpool_t threadpool)
 {
-	struct activate_params params = { x, n, a };
-	pthreadpool_compute_1d(threadpool, (pthreadpool_function_1d_t)activate_array_compute, &params, c);
+    struct activate_params params = { x, n, a };
+    pthreadpool_compute_1d(threadpool, (pthreadpool_function_1d_t)activate_array_compute, &params, c);
 }
 #endif
 
-float gradient(float x, ACTIVATION a)
-{
-    switch(a){
+float gradient(float x, ACTIVATION a) {
+    switch (a) {
         case LINEAR:
             return linear_gradient(x);
         case LOGISTIC:
@@ -162,10 +157,9 @@ float gradient(float x, ACTIVATION a)
     return 0;
 }
 
-void gradient_array(const float *x, const int n, const ACTIVATION a, float *delta)
-{
+void gradient_array(const float *x, const int n, const ACTIVATION a, float *delta) {
     int i;
-    for(i = 0; i < n; ++i){
+    for (i = 0; i < n; ++i) {
         delta[i] *= gradient(x[i], a);
     }
 } 

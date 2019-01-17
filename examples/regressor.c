@@ -2,19 +2,18 @@
 #include <sys/time.h>
 #include <assert.h>
 
-void train_regressor(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear)
-{
+void train_regressor(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear) {
     int i;
 
     float avg_loss = -1;
     char *base = basecfg(cfgfile);
     printf("%s\n", base);
     printf("%d\n", ngpus);
-    network **nets = calloc(ngpus, sizeof(network*));
+    network **nets = calloc(ngpus, sizeof(network * ));
 
     srand(time(0));
     int seed = rand();
-    for(i = 0; i < ngpus; ++i){
+    for (i = 0; i < ngpus; ++i) {
         srand(seed);
 #ifdef GPU
         cuda_set_device(gpus[i]);
@@ -35,7 +34,7 @@ void train_regressor(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
     int classes = option_find_int(options, "classes", 1);
 
     list *plist = get_paths(train_list);
-    char **paths = (char **)list_to_array(plist);
+    char **paths = (char **) list_to_array(plist);
     printf("%d\n", plist->size);
     int N = plist->size;
     clock_t time;
@@ -46,8 +45,8 @@ void train_regressor(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
     args.threads = 32;
     args.classes = classes;
 
-    args.min = net->min_ratio*net->w;
-    args.max = net->max_ratio*net->w;
+    args.min = net->min_ratio * net->w;
+    args.max = net->max_ratio * net->w;
     args.angle = net->angle;
     args.aspect = net->aspect;
     args.exposure = net->exposure;
@@ -66,16 +65,16 @@ void train_regressor(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
     args.d = &buffer;
     load_thread = load_data(args);
 
-    int epoch = (*net->seen)/N;
-    while(get_current_batch(net) < net->max_batches || net->max_batches == 0){
-        time=clock();
+    int epoch = (*net->seen) / N;
+    while (get_current_batch(net) < net->max_batches || net->max_batches == 0) {
+        time = clock();
 
         pthread_join(load_thread, 0);
         train = buffer;
         load_thread = load_data(args);
 
-        printf("Loaded: %lf seconds\n", sec(clock()-time));
-        time=clock();
+        printf("Loaded: %lf seconds\n", sec(clock() - time));
+        time = clock();
 
         float loss = 0;
 #ifdef GPU
@@ -87,19 +86,20 @@ void train_regressor(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
 #else
         loss = train_network(net, train);
 #endif
-        if(avg_loss == -1) avg_loss = loss;
-        avg_loss = avg_loss*.9 + loss*.1;
-        printf("%ld, %.3f: %f, %f avg, %f rate, %lf seconds, %ld images\n", get_current_batch(net), (float)(*net->seen)/N, loss, avg_loss, get_current_rate(net), sec(clock()-time), *net->seen);
+        if (avg_loss == -1) avg_loss = loss;
+        avg_loss = avg_loss * .9 + loss * .1;
+        printf("%ld, %.3f: %f, %f avg, %f rate, %lf seconds, %ld images\n", get_current_batch(net),
+               (float) (*net->seen) / N, loss, avg_loss, get_current_rate(net), sec(clock() - time), *net->seen);
         free_data(train);
-        if(*net->seen/N > epoch){
-            epoch = *net->seen/N;
+        if (*net->seen / N > epoch) {
+            epoch = *net->seen / N;
             char buff[256];
-            sprintf(buff, "%s/%s_%d.weights",backup_directory,base, epoch);
+            sprintf(buff, "%s/%s_%d.weights", backup_directory, base, epoch);
             save_weights(net, buff);
         }
-        if(get_current_batch(net)%100 == 0){
+        if (get_current_batch(net) % 100 == 0) {
             char buff[256];
-            sprintf(buff, "%s/%s.backup",backup_directory,base);
+            sprintf(buff, "%s/%s.backup", backup_directory, base);
             save_weights(net, buff);
         }
     }
@@ -108,13 +108,12 @@ void train_regressor(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
     save_weights(net, buff);
 
     free_network(net);
-    free_ptrs((void**)paths, plist->size);
+    free_ptrs((void **) paths, plist->size);
     free_list(plist);
     free(base);
 }
 
-void predict_regressor(char *cfgfile, char *weightfile, char *filename)
-{
+void predict_regressor(char *cfgfile, char *weightfile, char *filename) {
     network *net = load_network(cfgfile, weightfile, 0);
     set_batch_network(net, 1);
     srand(2222222);
@@ -122,24 +121,24 @@ void predict_regressor(char *cfgfile, char *weightfile, char *filename)
     clock_t time;
     char buff[256];
     char *input = buff;
-    while(1){
-        if(filename){
+    while (1) {
+        if (filename) {
             strncpy(input, filename, 256);
-        }else{
+        } else {
             printf("Enter Image Path: ");
             fflush(stdout);
             input = fgets(input, 256, stdin);
-            if(!input) return;
+            if (!input) return;
             strtok(input, "\n");
         }
         image im = load_image_color(input, 0, 0);
         image sized = letterbox_image(im, net->w, net->h);
 
         float *X = sized.data;
-        time=clock();
+        time = clock();
         float *predictions = network_predict(net, X);
         printf("Predicted: %f\n", predictions[0]);
-        printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
+        printf("%s: Predicted in %f seconds.\n", input, sec(clock() - time));
         free_image(im);
         free_image(sized);
         if (filename) break;
@@ -147,8 +146,7 @@ void predict_regressor(char *cfgfile, char *weightfile, char *filename)
 }
 
 
-void demo_regressor(char *datacfg, char *cfgfile, char *weightfile, int cam_index, const char *filename)
-{
+void demo_regressor(char *datacfg, char *cfgfile, char *weightfile, int cam_index, const char *filename) {
 #ifdef OPENCV
     printf("Regressor Demo\n");
     network *net = load_network(cfgfile, weightfile, 0);
@@ -196,9 +194,8 @@ void demo_regressor(char *datacfg, char *cfgfile, char *weightfile, int cam_inde
 }
 
 
-void run_regressor(int argc, char **argv)
-{
-    if(argc < 4){
+void run_regressor(int argc, char **argv) {
+    if (argc < 4) {
         fprintf(stderr, "usage: %s %s [train/test/valid] [cfg] [weights (optional)]\n", argv[0], argv[1]);
         return;
     }
@@ -207,18 +204,18 @@ void run_regressor(int argc, char **argv)
     int *gpus = 0;
     int gpu = 0;
     int ngpus = 0;
-    if(gpu_list){
+    if (gpu_list) {
         printf("%s\n", gpu_list);
         int len = strlen(gpu_list);
         ngpus = 1;
         int i;
-        for(i = 0; i < len; ++i){
+        for (i = 0; i < len; ++i) {
             if (gpu_list[i] == ',') ++ngpus;
         }
         gpus = calloc(ngpus, sizeof(int));
-        for(i = 0; i < ngpus; ++i){
+        for (i = 0; i < ngpus; ++i) {
             gpus[i] = atoi(gpu_list);
-            gpu_list = strchr(gpu_list, ',')+1;
+            gpu_list = strchr(gpu_list, ',') + 1;
         }
     } else {
         gpu = gpu_index;
@@ -231,10 +228,10 @@ void run_regressor(int argc, char **argv)
     char *data = argv[3];
     char *cfg = argv[4];
     char *weights = (argc > 5) ? argv[5] : 0;
-    char *filename = (argc > 6) ? argv[6]: 0;
-    if(0==strcmp(argv[2], "test")) predict_regressor(data, cfg, weights);
-    else if(0==strcmp(argv[2], "train")) train_regressor(data, cfg, weights, gpus, ngpus, clear);
-    else if(0==strcmp(argv[2], "demo")) demo_regressor(data, cfg, weights, cam_index, filename);
+    char *filename = (argc > 6) ? argv[6] : 0;
+    if (0 == strcmp(argv[2], "test")) predict_regressor(data, cfg, weights);
+    else if (0 == strcmp(argv[2], "train")) train_regressor(data, cfg, weights, gpus, ngpus, clear);
+    else if (0 == strcmp(argv[2], "demo")) demo_regressor(data, cfg, weights, cam_index, filename);
 }
 
 

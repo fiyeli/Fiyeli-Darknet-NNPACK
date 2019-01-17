@@ -2,8 +2,7 @@
 
 #include <sys/time.h>
 
-void demo_art(char *cfgfile, char *weightfile, int cam_index)
-{
+void demo_art(char *cfgfile, char *weightfile, int cam_index) {
 #ifdef OPENCV
     network *net = load_network(cfgfile, weightfile, 0);
     set_batch_network(net, 1);
@@ -35,7 +34,7 @@ void demo_art(char *cfgfile, char *weightfile, int cam_index)
         score = score;
         printf("I APPRECIATE THIS ARTWORK: %10.7f%%\n", score*100);
         printf("[");
-	int upper = 30;
+    int upper = 30;
         for(i = 0; i < upper; ++i){
             printf("%c", ((i+.5) < score*upper) ? 219 : ' ');
         }
@@ -49,8 +48,7 @@ void demo_art(char *cfgfile, char *weightfile, int cam_index)
 }
 
 
-void run_art(int argc, char **argv)
-{
+void run_art(int argc, char **argv) {
     int cam_index = find_int_arg(argc, argv, "-c", 0);
     char *cfg = argv[2];
     char *weights = argv[3];

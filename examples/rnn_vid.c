@@ -203,6 +203,8 @@ void run_vid_rnn(int argc, char **argv)
     else if(0==strcmp(argv[2], "generate")) generate_vid_rnn(cfg, weights);
 }
 #else
-void run_vid_rnn(int argc, char **argv){}
+
+void run_vid_rnn(int argc, char **argv) {}
+
 #endif
 

@@ -3,23 +3,25 @@
 # OK actually that might not be a great idea, idk, work in progress
 # Use at your own risk. or don't, i don't care
 
-from scipy.misc import imread
 import cv2
+from scipy.misc import imread
+
 
 def array_to_image(arr):
-    arr = arr.transpose(2,0,1)
+    arr = arr.transpose(2, 0, 1)
     c = arr.shape[0]
     h = arr.shape[1]
     w = arr.shape[2]
-    arr = (arr/255.0).flatten()
+    arr = (arr / 255.0).flatten()
     data = dn.c_array(dn.c_float, arr)
-    im = dn.IMAGE(w,h,c,data)
+    im = dn.IMAGE(w, h, c, data)
     return im
+
 
 def detect2(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     boxes = dn.make_boxes(net)
     probs = dn.make_probs(net)
-    num =   dn.num_boxes(net)
+    num = dn.num_boxes(net)
     dn.network_detect(net, image, thresh, hier_thresh, nms, boxes, probs)
     res = []
     for j in range(num):
@@ -30,8 +32,10 @@ def detect2(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     dn.free_ptrs(dn.cast(probs, dn.POINTER(dn.c_void_p)), num)
     return res
 
+
 import sys, os
-sys.path.append(os.path.join(os.getcwd(),'python/'))
+
+sys.path.append(os.path.join(os.getcwd(), 'python/'))
 
 import darknet as dn
 
@@ -42,7 +46,7 @@ r = dn.detect(net, meta, "data/dog.jpg")
 print r
 
 # scipy
-arr= imread('data/dog.jpg')
+arr = imread('data/dog.jpg')
 im = array_to_image(arr)
 r = detect2(net, meta, im)
 print r
@@ -53,4 +57,3 @@ im = array_to_image(arr)
 dn.rgbgr_image(im)
 r = detect2(net, meta, im)
 print r
-

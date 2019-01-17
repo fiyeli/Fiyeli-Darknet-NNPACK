@@ -341,9 +341,11 @@ pthread_join(detect_thread, 0);
 }
 */
 #else
-void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const char *filename, char **names, int classes, int delay, char *prefix, int avg, float hier, int w, int h, int frames, int fullscreen)
-{
+
+void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const char *filename, char **names, int classes,
+          int delay, char *prefix, int avg, float hier, int w, int h, int frames, int fullscreen) {
     fprintf(stderr, "Demo needs OpenCV for webcam images.\n");
 }
+
 #endif
 

@@ -11,11 +11,7 @@ sudo pip install --upgrade git+https://github.com/Maratyszcza/confu
 ```
 Install [Ninja](https://ninja-build.org/)
 ```
-git clone https://github.com/ninja-build/ninja.git
-cd ninja
-git checkout release
-./configure.py --bootstrap
-export NINJA_PATH=$PWD
+sudo apt-get install ninja
 ```
 Install clang
 ```
@@ -27,14 +23,14 @@ git clone https://github.com/digitalbrain79/NNPACK-darknet.git
 cd NNPACK-darknet
 confu setup
 python ./configure.py --backend auto
-$NINJA_PATH/ninja
+ninja -j 1 # You can remove -j 1 to enable multithreading but it's dangerous on raspberry
 sudo cp -a lib/* /usr/lib/
 sudo cp include/nnpack.h /usr/include/
 sudo cp deps/pthreadpool/include/pthreadpool.h /usr/include/
 ```
 Build darknet-nnpack
 ```
-git clone https://github.com/pilbi/Fiyeli-Darknet-NNPACK
+git clone https://github.com/fiyeli/Fiyeli-Darknet-NNPACK
 cd darknet-nnpack
 make
 ```
@@ -49,6 +45,6 @@ Other weight files can be downloaded from the [YOLO homepage](https://pjreddie.c
 ## Run person detection
 The main executable returns the number of persons detected on the picture when used with the "person" mode.
 ```console
-YOLOv3
+YOLOv2
 ./darknet detector person cfg/coco.data cfg/yolov2.cfg yolov2.weights data/person.jpg
 ```
